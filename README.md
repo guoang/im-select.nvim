@@ -2,24 +2,25 @@
 
 Switch Input Method automatically depends on Neovim's edit mode.
 
-The old vim plugins (such as [im-select](https://github.com/daipeihust/im-select)) works weird on my Macbook, so I just create this im-select in pure lua for Neovim, it works charmly!
+This repo is forked from
+[keaising/im-select.nvim](https://github.com/keaising/im-select.nvim),
+but has been refactored. New features:
 
-Current version only works for Neovim on macOS, Windows and WSL.
-
-Linux support is welcome!
+- use `jobstart` to select IM asynchronously.
+- auto select IM by both vim mode and file type.
+- toggle auto IM selection at runtime.
 
 ## 1. Install binary
 
-Please install execute binary `im-select` first
+Please install the executable
+[im-select](https://github.com/daipeihust/im-select) first.
 
-Download URL:  [im-select](https://github.com/daipeihust/im-select)
+_Note_: Putting binary into some path which Neovim can read from,
+you can detect it in Neovim by:
 
-Note: Putting binary into some path which Neovim can read from, you can detect it in Neovim by:
-
-```
+```bash
 # Windows / WSL
 :!which im-select.exe
-
 # macOS
 :!which im-select
 ```
@@ -28,36 +29,46 @@ Note: Putting binary into some path which Neovim can read from, you can detect i
 
 Packer
 
-``` lua
-use 'keaising/im-select.nvim'
+```lua
+use 'guoang/im-select.nvim'
 ```
 
 Plug
 
-``` vim
-Plug 'keaising/im-select.nvim'
+```vim
+Plug 'guoang/im-select.nvim'
 ```
 
 ## 3. Config
 
-Setup with default value works well enough:
-
 ```lua
-require('im_select').setup()
+require("im_select").setup({
+ -- IM will be used in `normal` mode
+ -- For Windows/WSL, default: "1033", aka: English US Keyboard
+ -- For macOS, default: "com.apple.keylayout.ABC", aka: US
+ -- You can use `im-select` in cli to get the IM name of you preferred
+ im_normal = "com.apple.keylayout.ABC",
+ -- IM will be used in `normal` mode depend on **file type**
+ im_normal_ft = {
+   TelescopePrompt = "com.apple.keylayout.ABC",
+ },
+ -- IM will be used in `insert` mode
+ im_insert = "com.apple.keylayout.ABC",
+ -- IM will be used in `insert` mode depend on **file type**
+ im_insert_ft = {
+   TelescopePrompt = "com.apple.keylayout.ABC",
+   markdown = "com.apple.inputmethod.SCIM.Shuangpin",
+ },
+ -- Create auto command to select `im_normal` when `InsertLeave`
+ auto_select_normal = true,
+ -- Create auto command to select `im_insert` when `InsertEnter`
+ auto_select_insert = true,
+ -- keymaps to toggle auto selection
+   keymaps = {
+     toggle_auto_select_normal = "",
+     toggle_auto_select_insert = "",
+   },
+})
 ```
 
-If you want to change some settings: 
-
-```lua
-require('im_select').setup {
-	-- IM will be set to `default_im_select` in `normal` mode(`EnterVim` or `InsertLeave`)
-	-- For Windows/WSL, default: "1033", aka: English US Keyboard
-	-- For macOS, default: "com.apple.keylayout.ABC", aka: US
-	-- You can use `im-select` in cli to get the IM name of you preferred
-	default_im_select  = "com.apple.keylayout.ABC",
-
-	-- Set to 1 if you don't want restore IM status when `InsertEnter`
-	disable_auto_restore = 0,
-}
-```
-
+_Im-select_ creates some auto-commands, use `:autocmd im-select` to inspect.
