@@ -11,7 +11,7 @@ M.im_insert_ft = {}
 
 local function determine_os()
 	if vim.fn.has("macunix") == 1 then
-		im_select_command = "im-select"
+		im_select_command = "macism"
 		M.im_normal = "com.apple.keylayout.ABC"
 		return "macOS"
 	elseif vim.fn.has("win32") == 1 then
@@ -73,12 +73,20 @@ M.set_insert_im_auto = function(auto)
 end
 
 M.toggle_normal_im_auto = function()
-  local auto = vim.api.nvim_buf_get_var(0, "im_select_auto_normal")
+  local status, auto = pcall(vim.api.nvim_buf_get_var, 0, "im_select_auto_normal")
+  if not status then
+    M.set_normal_im_auto(not auto_select_normal)
+    return
+  end
   M.set_normal_im_auto(not auto)
 end
 
 M.toggle_insert_im_auto = function()
-  local auto = vim.api.nvim_buf_get_var(0, "im_select_auto_insert")
+  local status, auto = pcall(vim.api.nvim_buf_get_var, 0, "im_select_auto_insert")
+  if not status then
+    M.set_insert_im_auto(not auto_select_insert)
+    return
+  end
   M.set_insert_im_auto(not auto)
 end
 
