@@ -2,73 +2,103 @@
 
 Switch Input Method automatically depends on Neovim's edit mode.
 
-This repo is forked from
-[keaising/im-select.nvim](https://github.com/keaising/im-select.nvim),
-but has been refactored. New features:
+Forked from [keaising/im-select.nvim](https://github.com/keaising/im-select.nvim), with the following improvements:
 
-- use `jobstart` to select IM asynchronously.
-- auto select IM by both vim mode and file type.
-- toggle auto IM selection at runtime.
+- Asynchronous IM switching via `jobstart`
+- Per-filetype IM selection for both normal and insert modes
+- Runtime toggle of auto IM selection per buffer
+- FileType autocommands for filetype-specific IM setup
 
-## 1. Install binary
+## Requirements
 
-Please install the executable
-[im-select](https://github.com/daipeihust/im-select) first.
+| Platform | IM Switcher | Default Normal IM |
+|----------|-------------|-------------------|
+| macOS | [macism](https://github.com/laishulu/macism) | `com.apple.keylayout.ABC` |
+| Windows | [im-select](https://github.com/daipeihust/im-select) | `1033` |
+| WSL | [im-select](https://github.com/daipeihust/im-select) (`.exe`) | `1033` |
 
-_Note_: Putting binary into some path which Neovim can read from,
-you can detect it in Neovim by:
+> Linux is not supported yet. PR welcome.
 
-```bash
-# Windows / WSL
+Make sure the binary is in your `$PATH`. Verify in Neovim:
+
+```vim
+" macOS
+:!which macism
+" Windows / WSL
 :!which im-select.exe
-# macOS
-:!which im-select
 ```
 
-## 2. Install plugin
+## Installation
 
-Packer
+[lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
-use 'guoang/im-select.nvim'
+{
+  'guoang/im-select.nvim',
+  config = function()
+    require('im_select').setup()
+  end,
+}
 ```
 
-Plug
+[packer.nvim](https://github.com/wbthomason/packer.nvim)
+
+```lua
+use {
+  'guoang/im-select.nvim',
+  config = function()
+    require('im_select').setup()
+  end,
+}
+```
+
+[vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
 Plug 'guoang/im-select.nvim'
 ```
 
-## 3. Config
+## Configuration
 
 ```lua
-require("im_select").setup({
- -- IM will be used in `normal` mode
- -- For Windows/WSL, default: "1033", aka: English US Keyboard
- -- For macOS, default: "com.apple.keylayout.ABC", aka: US
- -- You can use `im-select` in cli to get the IM name of you preferred
- im_normal = "com.apple.keylayout.ABC",
- -- IM will be used in `normal` mode depend on **file type**
- im_normal_ft = {
-   TelescopePrompt = "com.apple.keylayout.ABC",
- },
- -- IM will be used in `insert` mode
- im_insert = "com.apple.keylayout.ABC",
- -- IM will be used in `insert` mode depend on **file type**
- im_insert_ft = {
-   TelescopePrompt = "com.apple.keylayout.ABC",
-   markdown = "com.apple.inputmethod.SCIM.Shuangpin",
- },
- -- Create auto command to select `im_normal` when `InsertLeave`
- auto_select_normal = true,
- -- Create auto command to select `im_insert` when `InsertEnter`
- auto_select_insert = true,
- -- keymaps to toggle auto selection
-   keymaps = {
-     toggle_auto_select_normal = "",
-     toggle_auto_select_insert = "",
-   },
+require('im_select').setup({
+  -- IM for normal mode (platform default if omitted)
+  im_normal = "com.apple.keylayout.ABC",
+
+  -- IM for insert mode (leave empty to skip switching on InsertEnter)
+  im_insert = "com.apple.keylayout.ABC",
+
+  -- Per-filetype IM overrides for normal mode
+  im_normal_ft = {
+    TelescopePrompt = "com.apple.keylayout.ABC",
+  },
+
+  -- Per-filetype IM overrides for insert mode
+  im_insert_ft = {
+    markdown = "com.apple.inputmethod.SCIM.Shuangpin",
+  },
+
+  -- Auto-switch IM on InsertLeave (default: true)
+  auto_select_normal = true,
+
+  -- Auto-switch IM on InsertEnter (default: true)
+  auto_select_insert = true,
+
+  -- Keymaps to toggle auto-switching per buffer
+  keymaps = {
+    toggle_auto_select_normal = "",  -- e.g. "<leader>in"
+    toggle_auto_select_insert = "",  -- e.g. "<leader>ii"
+  },
 })
 ```
 
-_Im-select_ creates some auto-commands, use `:autocmd im-select` to inspect.
+## Plug Mappings
+
+The plugin registers `<Plug>` mappings that can be used in custom keymaps:
+
+- `<Plug>ImSelect_toggle_auto_normal` -- toggle auto IM selection on `InsertLeave` for the current buffer
+- `<Plug>ImSelect_toggle_auto_insert` -- toggle auto IM selection on `InsertEnter` for the current buffer
+
+## Autocommands
+
+Use `:autocmd im-select` to inspect the autocommands created by this plugin.

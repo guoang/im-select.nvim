@@ -163,12 +163,12 @@ M.setup = function(opts)
     { silent = true, desc = "Toggle auto select normal im" })
 
   if opts ~= nil and opts.keymaps ~= nil then
-    if opts.keymaps.togle_auto_select_normal then
-      vim.keymap.set({ 'n' }, opts.keymaps.togle_auto_select_normal, "<Plug>ImSelect_toggle_auto_normal",
+    if opts.keymaps.toggle_auto_select_normal then
+      vim.keymap.set({ 'n' }, opts.keymaps.toggle_auto_select_normal, "<Plug>ImSelect_toggle_auto_normal",
         { silent = true, desc = "Toggle auto select normal im" })
     end
-    if opts.keymaps.togle_auto_select_insert then
-      vim.keymap.set({ 'n' }, opts.keymaps.togle_auto_select_insert, "<Plug>ImSelect_toggle_auto_insert",
+    if opts.keymaps.toggle_auto_select_insert then
+      vim.keymap.set({ 'n' }, opts.keymaps.toggle_auto_select_insert, "<Plug>ImSelect_toggle_auto_insert",
         { silent = true, desc = "Toggle auto select insert im" })
     end
   end
